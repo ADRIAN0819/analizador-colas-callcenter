@@ -130,6 +130,15 @@ def procesar_archivos(archivo_detalle, archivo_timeline):
         with open(timeline_path, "wb") as f:
             f.write(archivo_timeline.getvalue())
         
+        # Verificar que los archivos se crearon correctamente
+        if os.path.exists(detalle_path) and os.path.exists(timeline_path):
+            detalle_size = os.path.getsize(detalle_path)
+            timeline_size = os.path.getsize(timeline_path)
+            st.info(f"📁 Archivos guardados:\n- Detalle: {detalle_size:,} bytes\n- Timeline: {timeline_size:,} bytes")
+        else:
+            st.error("❌ Error: No se pudieron guardar los archivos correctamente")
+            return
+        
         # Copiar scripts de análisis al directorio temporal
         scripts_originales = [
             "AnalisisMDA.py",
@@ -140,12 +149,24 @@ def procesar_archivos(archivo_detalle, archivo_timeline):
             "AnalisisRedes.py"
         ]
         
+        # Scripts auxiliares que también se necesitan
+        scripts_auxiliares = [
+            "Analisis_timeline_mda.py",
+            "Analisis_timeline_fraude.py"
+        ]
+        
         # Mostrar progress bar
         progress_bar = st.progress(0)
         status_text = st.empty()
         
         try:
             total_scripts = len(scripts_originales)
+            
+            # Primero copiar todos los scripts auxiliares
+            for script_aux in scripts_auxiliares:
+                if os.path.exists(script_aux):
+                    script_aux_temp = os.path.join(temp_dir, script_aux)
+                    shutil.copy2(script_aux, script_aux_temp)
             
             for i, script in enumerate(scripts_originales):
                 status_text.text(f"🔄 Ejecutando {script.replace('.py', '').replace('Analisis', 'Análisis ')}...")
@@ -165,7 +186,12 @@ def procesar_archivos(archivo_detalle, archivo_timeline):
                 if resultado.returncode == 0:
                     st.success(f"✅ {script} completado")
                 else:
-                    st.error(f"❌ Error en {script}: {resultado.stderr}")
+                    st.error(f"❌ Error en {script}")
+                    with st.expander(f"Ver detalles del error - {script}"):
+                        if resultado.stderr:
+                            st.code(resultado.stderr)
+                        if resultado.stdout:
+                            st.code(resultado.stdout)
                 
                 # Actualizar progress bar
                 progress_bar.progress((i + 1) / total_scripts)
