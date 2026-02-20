@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
+# -- coding: utf-8 --
 """
 ANÁLISIS DE FRAUDE SALIDA - PROCESADOR DE LLAMADAS SALIENTES
 ============================================================
@@ -123,9 +124,37 @@ def main():
         print(f"📋 ARCHIVO GENERADO: ExportadosGenerados/Analisis_FraudeOut_Por_intervalos.csv")
         print(f"📊 Total intervalos: {len(df_resultado)}")
         
+        # ── Sumar contestadas de Fraude_Camp y Fraude_CampT2 casilla por casilla ──
+        fraude_camp_filtrado = fraude_salida_data[
+            fraude_salida_data['Nombre de cola'].isin(['Fraude_Camp', 'Fraude_CampT2'])
+        ]
+        contestadas_camp = {}
+        for _, row in fraude_camp_filtrado.iterrows():
+            try:
+                inicio = pd.to_datetime(str(row['Inicio del intervalo']), format='%d/%m/%y %H:%M', dayfirst=True)
+                fin = pd.to_datetime(str(row['Fin del intervalo']), format='%d/%m/%y %H:%M', dayfirst=True)
+                if inicio.hour == 23 and inicio.minute == 30:
+                    key = "23:30-00:00"
+                else:
+                    key = f"{inicio.hour:02d}:{inicio.minute:02d}-{fin.hour:02d}:{fin.minute:02d}"
+                contestadas = pd.to_numeric(row['Contestadas'], errors='coerce')
+                if pd.notna(contestadas):
+                    contestadas_camp[key] = contestadas_camp.get(key, 0) + int(contestadas)
+            except Exception:
+                continue
+        
+        # Leer CSV generado y sumar casilla por casilla
+        df_csv = pd.read_csv('ExportadosGenerados/Analisis_FraudeOut_Por_intervalos.csv')
+        for idx, row in df_csv.iterrows():
+            intervalo = row['Intervalo']
+            if intervalo in contestadas_camp:
+                df_csv.at[idx, 'Llamadas_Salientes'] = row['Llamadas_Salientes'] + contestadas_camp[intervalo]
+        df_csv.to_csv('ExportadosGenerados/Analisis_FraudeOut_Por_intervalos.csv', index=False)
+        print(f"📞 Contestadas Fraude_Camp/CampT2 sumadas: {sum(contestadas_camp.values()) if contestadas_camp else 0}")
+        
         # Mostrar resumen
-        total_llamadas_salientes = df_resultado['Llamadas_Salientes'].sum()
-        print(f"📞 Total llamadas salientes: {total_llamadas_salientes}")
+        total_llamadas_salientes = df_csv['Llamadas_Salientes'].sum()
+        print(f"📞 Total llamadas salientes (con camps): {total_llamadas_salientes}")
         
         print("✅ Análisis Fraude Salida - COMPLETADO EXITOSAMENTE")
         
@@ -133,5 +162,5 @@ def main():
         print(f"❌ Error general: {e}")
         sys.exit(1)
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
