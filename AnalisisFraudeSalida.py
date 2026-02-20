@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 """
 ANÁLISIS DE FRAUDE SALIDA - PROCESADOR DE LLAMADAS SALIENTES
 ============================================================
@@ -162,5 +162,5 @@ def main():
         print(f"❌ Error general: {e}")
         sys.exit(1)
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
