@@ -304,8 +304,11 @@ def mostrar_grafico_colas():
         st.error("❌ El archivo subido no contiene las columnas necesarias ('Nombre de cola', 'Inicio del intervalo')")
         return
         
-    # Filtrar solo colas que comiencen con MA_
-    df_ma = df[df['Nombre de cola'].str.startswith('MA_', na=False)].copy()
+    # Filtrar solo colas que comiencen con MA_ y excluir registros consolidados con ';'
+    df_ma = df[
+        (df['Nombre de cola'].str.startswith('MA_', na=False)) &
+        (~df['Nombre de cola'].str.contains(';', na=False))
+    ].copy()
     
     if len(df_ma) == 0:
         st.warning("⚠️ No se encontraron colas que comiencen con 'MA_' en los datos.")
