@@ -39,7 +39,7 @@ def main():
     Esta herramienta procesa los datos exportados de **Genesys** y genera automáticamente 
     **6 análisis completos** de las diferentes colas del call center:
     
-    - 📞 **Mesa de Ayuda** - Análisis detallado por intervalos
+    - 📞 **Mesa de Ayuda** - Análisis detallado por intervalos (28 colas)
     - ☎️ **Central Telefónica** - Métricas de atención
     - 🛡️ **Fraude** - Análisis de llamadas entrantes
     - 📤 **Fraude Salida** - Análisis de llamadas salientes  

@@ -82,7 +82,7 @@ def main():
             print(f"❌ Error al cargar: {e}")
             return
     
-    # Filtrar datos de Mesa de Ayuda - Lista específica de 26 colas
+    # Filtrar datos de Mesa de Ayuda - Lista específica de 28 colas
     colas_mesa_ayuda = [
         'A_MA Total',
         'CI_Banca_Movil',
@@ -96,6 +96,7 @@ def main():
         'MA_Banca Platino',
         'MA_BloqueoCredito',
         'MA_BloqueoDebito',
+        'MA_Cargo_Regulatorio',
         'MA_Credito',
         'MA_Cronograma',
         'MA_CuentaAhorros',
@@ -109,7 +110,8 @@ def main():
         'MA_PagaloPe',
         'MA_Prestamos',
         'MA_Reclamos',
-        'MA_Tasas'
+        'MA_Tasas',
+        'MA_Trans_Proceso'
     ]
     
     df_mesa_ayuda = df[
@@ -346,6 +348,7 @@ def main():
         
         # Eliminar columna auxiliar antes de guardar
         df_final = df_resultados.drop('TMO_Segundos_Calculo', axis=1)
+        os.makedirs(os.path.dirname(archivo_salida), exist_ok=True)
         df_final.to_csv(archivo_salida, index=False)
         
         # Análisis adicional con información cruzada
