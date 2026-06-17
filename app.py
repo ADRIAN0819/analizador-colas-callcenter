@@ -337,8 +337,15 @@ def mostrar_grafico_colas():
         
     df_ma['hora_label'] = df_ma['hora_completa'].apply(formatear_hora)
     
-    # Obtener horas únicas ordenadas
-    horas_disponibles = sorted(df_ma['hora_label'].unique())
+    # Obtener horas únicas ordenadas cronológicamente
+    horas_ordenadas_dt = sorted(df_ma['hora_completa'].dropna().unique())
+    
+    # Generar etiquetas mapeadas en orden cronológico
+    horas_disponibles = []
+    for dt in horas_ordenadas_dt:
+        label = formatear_hora(dt)
+        if label not in horas_disponibles:
+            horas_disponibles.append(label)
     
     if not horas_disponibles:
         st.warning("⚠️ No se encontraron horas disponibles en los datos.")
@@ -379,13 +386,17 @@ def mostrar_grafico_colas():
     
     st.markdown(f"#### 📈 Top colas en el horario {hora_seleccionada}")
     
-    # Mostrar como gráfico de barras interactivo
-    st.bar_chart(
-        data=resumen_colas,
-        x='Cola',
-        y='Llamadas Recibidas (Oferta)',
-        use_container_width=True
+    # Mostrar como gráfico de barras interactivo ordenado de mayor a menor
+    import altair as alt
+    
+    chart = alt.Chart(resumen_colas).mark_bar().encode(
+        x=alt.X('Cola:N', sort='-y', title='Cola'),
+        y=alt.Y('Llamadas Recibidas (Oferta):Q', title='Llamadas Recibidas (Oferta)'),
+        color=alt.value('#1f77b4')
+    ).properties(
+        height=400
     )
+    st.altair_chart(chart, use_container_width=True)
     
     # Mostrar tabla resumen para mayor precisión
     st.dataframe(
