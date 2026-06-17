@@ -386,14 +386,27 @@ def mostrar_grafico_colas():
     
     st.markdown(f"#### 📈 Top colas en el horario {hora_seleccionada}")
     
-    # Mostrar como gráfico de barras interactivo ordenado de mayor a menor
+    # Mostrar como gráfico de barras interactivo ordenado de mayor a menor con el valor dentro de la barra
     import altair as alt
     
-    chart = alt.Chart(resumen_colas).mark_bar().encode(
+    base = alt.Chart(resumen_colas).encode(
         x=alt.X('Cola:N', sort='-y', title='Cola'),
-        y=alt.Y('Llamadas Recibidas (Oferta):Q', title='Llamadas Recibidas (Oferta)'),
-        color=alt.value('#1f77b4')
-    ).properties(
+        y=alt.Y('Llamadas Recibidas (Oferta):Q', title='Llamadas Recibidas (Oferta)')
+    )
+    
+    bars = base.mark_bar(color='#1f77b4')
+    
+    text = base.mark_text(
+        align='center',
+        baseline='middle',
+        dy=15,  # Desplazar hacia abajo para colocar el número dentro de la barra
+        color='white',
+        fontWeight='bold'
+    ).encode(
+        text='Llamadas Recibidas (Oferta):Q'
+    )
+    
+    chart = (bars + text).properties(
         height=400
     )
     st.altair_chart(chart, use_container_width=True)
