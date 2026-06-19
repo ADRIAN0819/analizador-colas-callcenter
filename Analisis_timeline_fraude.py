@@ -159,9 +159,13 @@ def analizar_linea_tiempo_fraude_corregido(fecha_objetivo=None):
         
         # Filtrar por Supervisor_FR y estado "En la cola" (case insensitive)
         if 'Nombre de la división' in df.columns:
+            # Lista de agentes a excluir
+            ags_excluidos = ('AG0024', 'AG0197', 'AG0108', 'AG0124', 'AG0126', 'AG0134', 'AG0152')
+            
             df_filtrado = df[
                 (df['Nombre de la división'].str.contains('supervisor_fr', case=False, na=False)) & 
-                (df['Estado principal'] == 'En la cola')
+                (df['Estado principal'] == 'En la cola') &
+                (~df['Nombre del agente'].str.startswith(ags_excluidos, na=False))
             ].copy()
         else:
             return {}
