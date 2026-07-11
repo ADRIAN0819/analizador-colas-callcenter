@@ -10,6 +10,9 @@ los 6 análisis de colas en formato CSV.
 Autor: Sistema de Análisis de Call Center
 """
 
+import faulthandler
+faulthandler.enable()
+
 import streamlit as st
 import pandas as pd
 import os
