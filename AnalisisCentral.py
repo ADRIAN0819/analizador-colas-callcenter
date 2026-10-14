@@ -277,7 +277,9 @@ def procesar_archivo_central():
         total_recibidas = df_resultado['Llamadas_Recibidas'].sum()
         total_atendidas = df_resultado['Llamadas_Atendidas'].sum()
         total_abandonadas = df_resultado['Llamadas_Abandonadas'].sum()
-        tmo_promedio = df_resultado[df_resultado['TMO'] != '00:00:00']['TMO'].apply(lambda x: sum(int(t) * 60**i for i, t in enumerate(reversed(x.split(':')))) / 60).mean()
+        tmo_minutos_lista = [sum(int(t) * 60**i for i, t in enumerate(reversed(str(x).split(':')))) / 60
+                             for x in df_resultado['TMO'] if str(x) != '00:00:00']
+        tmo_promedio = float(np.mean(tmo_minutos_lista)) if tmo_minutos_lista else np.nan
         nivel_atencion_promedio = df_resultado[df_resultado['Nivel_Atencion'] > 0]['Nivel_Atencion'].mean()
         
         print(f"Total llamadas recibidas: {total_recibidas:,}")

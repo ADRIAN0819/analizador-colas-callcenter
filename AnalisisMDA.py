@@ -229,8 +229,12 @@ def main():
             tmo_promedio_segundos = tmo_total_segundos / llamadas_manejadas_total
             tmo_minutos = tmo_promedio_segundos / 60
         else:
+            tmo_promedio_segundos = 0
             tmo_minutos = 0
-        
+
+        # Obtener agentes conectados del timeline corregido
+        agentes_conectados = agentes_por_intervalo.get(f"{grupo.iloc[0]['hora_inicio']}-{grupo.iloc[0]['hora_fin']}", 0) if len(grupo) > 0 else 0
+
         # Obtener intervalo display
         if len(grupo) > 0:
             primer_registro = grupo.iloc[0]
